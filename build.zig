@@ -36,6 +36,16 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    // SDL.
+    const sdl_path = "C:\\lib\\SDL2-2.30.1\\";
+    exe.addIncludePath(.{.cwd_relative  = sdl_path ++ "include"});
+    exe.addLibraryPath(.{.cwd_relative  = sdl_path ++ "lib\\x64"});
+
+    b.getInstallStep().dependOn(&b.addInstallBinFile(.{ .cwd_relative = sdl_path ++ "lib\\x64\\SDL2.dll" }, "SDL2.dll").step);
+
+    exe.linkSystemLibrary("sdl2");
+    exe.linkLibC();
+
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
     // step when running `zig build`).
