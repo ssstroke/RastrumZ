@@ -3,7 +3,7 @@ const std = @import("std");
 // Although this function looks imperative, note that its job is to
 // declaratively construct a build graph that will be executed by an external
 // runner.
-pub fn build(b: *std.Build) void {
+pub fn build(b: *std.Build) !void {
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
     // means any target is allowed, and the default is native. Other options
@@ -22,15 +22,15 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    // SDL.
-    const sdl_path = "C:\\lib\\SDL2-2.30.1\\";
-    exe.addIncludePath(.{.cwd_relative  = sdl_path ++ "include"});
-    exe.addLibraryPath(.{.cwd_relative  = sdl_path ++ "lib\\x64"});
+    const zsdl = b.dependency("zsdl", .{});
+    const zsdl_path = zsdl.path("").getPath(b);
 
-    b.getInstallStep().dependOn(&b.addInstallBinFile(.{ .cwd_relative = sdl_path ++ "lib\\x64\\SDL2.dll" }, "SDL2.dll").step);
+    exe.root_module.addImport("zsdl2", zsdl.module("zsdl2"));
 
-    exe.linkSystemLibrary("sdl2");
-    exe.linkLibC();
+    try @import("zsdl").addLibraryPathsTo(exe, zsdl_path);
+    @import("zsdl").link_SDL2(exe);
+
+    try @import("zsdl").install_sdl2(&exe.step, target.result, .bin, zsdl_path);
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default

@@ -1,11 +1,17 @@
 const std = @import("std");
-const s = @cImport(
-    @cInclude("SDL.h"),
-);
+const sdl = @import("zsdl2");
 
 pub fn main() !void {
-    std.debug.print("Hello, SDL2!\n", .{});
+    try sdl.init(.{ .video = true, .events = true });
+    defer sdl.quit();
 
-    _ = s.SDL_Init(s.SDL_INIT_VIDEO | s.SDL_INIT_EVENTS);
-    defer s.SDL_Quit();
+    const window = try sdl.Window.create(
+        "zig-gamedev-window",
+        sdl.Window.pos_undefined,
+        sdl.Window.pos_undefined,
+        640,
+        640,
+        .{},
+    );
+    defer window.destroy();
 }
