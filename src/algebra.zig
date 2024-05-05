@@ -1,6 +1,5 @@
 const std = @import("std");
 const math = std.math;
-const pi = math.pi;
 
 // Aliases.
 //
@@ -18,11 +17,11 @@ pub const Mat4x4 = [4]Vec4;
 //
 
 pub fn degreesToRadians(degrees: f32) f32 {
-    return (degrees * pi / 180);
+    return (degrees * std.math.pi / 180);
 }
 
 pub fn radiansToDegrees(radians: f32) f32 {
-    return (radians * 180 / pi);
+    return (radians * 180 / std.math.pi);
 }
 
 // Vec2 functions.
@@ -76,7 +75,7 @@ pub fn vec3Dot(v0: Vec3, v1: Vec3) f32 {
     return result[0] + result[1] + result[2];
 }
 
-pub fn vec3Cross(v0: Vec3, v1: Vec3) f32 {
+pub fn vec3Cross(v0: Vec3, v1: Vec3) Vec3 {
     return Vec3{
         v0[1] * v1[2] - v0[2] * v1[1],
         v0[2] * v1[0] - v0[0] * v1[2],
@@ -114,10 +113,10 @@ pub fn vec3MulByMat4x4(v: Vec3, m: Mat4x4) Vec3 {
 
 pub fn initIdentityMatrix() Mat4x4 {
     return Mat4x4{
-        Vec3{1, 0, 0, 0},
-        Vec3{0, 1, 0, 0},
-        Vec3{0, 0, 1, 0},
-        Vec3{0, 0, 0, 1},
+        Vec4{1, 0, 0, 0},
+        Vec4{0, 1, 0, 0},
+        Vec4{0, 0, 1, 0},
+        Vec4{0, 0, 0, 1},
     };
 }
 
@@ -133,4 +132,75 @@ pub fn mat4x4Mul(m0: Mat4x4, m1: Mat4x4) Mat4x4 {
         }
     }
     return result;
+}
+
+pub fn mat4x4Inverse(m: Mat4x4) Mat4x4 {
+    var s: Mat4x4 = initIdentityMatrix();
+    var t: Mat4x4 = m;
+
+    // Forward elimination.
+    for (0..4) |i| {
+        var pivot = i;
+        var pivot_size: f32 = if (t[i][i] < 0) -t[i][i] else t[i][i];
+
+        for (i + 1 ..4) |j| {
+            const tmp: f32 = if (t[j][i] < 0) -t[j][i] else t[j][i];
+            if (tmp > pivot_size) {
+                pivot = j;
+                pivot_size = tmp;
+                
+            }
+        }
+
+        if (pivot_size == 0) return s;
+
+        if (pivot != i) {
+            for (0..4) |j| {
+                var tmp: f32 = t[i][j];
+                t[i][j] = t[pivot][j];
+                t[pivot][j] = tmp;
+
+                tmp = s[i][j];
+                s[i][j] = s[pivot][j];
+                s[pivot][j] = tmp;
+            }
+        }
+
+        // Step 2: Eliminate all the number below the diagonal.
+        for (i + 1 ..4) |j| {
+            const f: f32 = t[j][i] / t[i][i];
+            for (0..4) |k| {
+                t[j][k] -= f * t[i][k];
+                s[j][k] -= f * s[i][k];
+            }
+
+            // In case of rounding error.
+            t[j][i] = 0;
+        }
+    }
+
+    // Step 3: Set elements along the diagonal to 1.
+    for (0..4) |i| {
+        const divisor: f32 = t[i][i];
+        for (0..4) |j| {
+            t[i][j] /=  divisor;
+            s[i][j] /=  divisor;
+        }
+
+        // In case of rounding error;
+        t[i][i] = 1;
+    }
+
+    // Step 4: Eliminate all the numbers above the diagonal
+    for (0..3) |i| {
+        for (i + 1 ..4) |j| {
+            const constant: f32 = t[i][j];
+            for (0..4) |k| {
+                t[i][k] -= t[j][k] * constant;
+                s[i][k] -= s[j][k] * constant;
+            }
+        }
+    }
+
+    return s;
 }

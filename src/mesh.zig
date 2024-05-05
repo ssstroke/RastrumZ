@@ -41,7 +41,7 @@ pub fn meshLoadFromObj(comptime filename: []const u8) !*Mesh {
     mesh.number_of_faces = number_of_faces;
     mesh.number_of_vertices = number_of_vertices;
 
-    mesh.vertices = try allocator.alloc(Vec3, number_of_vertices * 3);
+    mesh.vertices = try allocator.alloc(Vec3, number_of_vertices);
     mesh.indices = try allocator.alloc(u32, number_of_faces * 3);
     mesh.color = 0xff00ffff;
 
@@ -51,8 +51,6 @@ pub fn meshLoadFromObj(comptime filename: []const u8) !*Mesh {
     var current_index: u32 = 0;
 
     while (try reader.readUntilDelimiterOrEof(&buffer, '\n')) |line| {
-        std.debug.print("[DEBUG]: {s}\n", .{line});
-
         switch (line[0]) {
             'v'  => {
                 var iter = std.mem.splitScalar(u8, line, ' ');
@@ -73,12 +71,12 @@ pub fn meshLoadFromObj(comptime filename: []const u8) !*Mesh {
 
                     if (std.fmt.parseFloat(f32, number_string)) |number| {
                         mesh.vertices[current_vertex][i_xyz] = number;
-                        current_vertex += 1;
                     } else |err| {
                         std.debug.print("File `{s}` is corrupted!\n", .{filename});
                         return err;
                     }
                 }
+                current_vertex += 1;
             },
 
             'f'  => {
@@ -99,7 +97,7 @@ pub fn meshLoadFromObj(comptime filename: []const u8) !*Mesh {
                     };
 
                     if (std.fmt.parseUnsigned(u32, number_string, 10)) |number| {
-                        mesh.indices[current_index] = number;
+                        mesh.indices[current_index] = number - 1;
                         current_index += 1;
                     } else |err| {
                         std.debug.print("File `{s}` is corrupted!\n", .{filename});
