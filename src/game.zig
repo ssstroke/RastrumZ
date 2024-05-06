@@ -169,6 +169,17 @@ pub fn gameUpdate(objects: []GameObject, ball: *GameObject, ball_direction: *alg
     //
     ball.transform[3][0] += ball_direction[0] * speed;
     ball.transform[3][2] += ball_direction[1] * speed;
+
+    if (ball.transform[3][2] >= 4) {
+        entities_destroyed = 0;
+        for (0..objects.len) |k| {
+            objects[k].active = true;
+            ball_direction[0] = 0;
+            ball_direction[1] = 0.5;
+            ball.transform[3][0] = 0;
+            ball.transform[3][2] = -7;
+        }
+    }
 }
 
 fn intersectRaySegmentSphere(o: algebra.Vec3, d: algebra.Vec3, so: algebra.Vec3, radius2: f32) bool {

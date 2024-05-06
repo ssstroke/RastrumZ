@@ -28,7 +28,7 @@ pub fn main() !void {
     defer sdl.quit();
 
     var window = try sdl.Window.create(
-        "zig-gamedev-window",
+        "RastrumZ",
         sdl.Window.pos_undefined,
         sdl.Window.pos_undefined,
         @as(i32, window_width),
@@ -214,7 +214,11 @@ pub fn main() !void {
         -@as(f32, @sin(algebra.degreesToRadians(45))),
     };
 
+    // var timestamp_1 = std.time.microTimestamp();
+
     main_loop: while (true) {
+        // const timestamp_0 = std.time.microTimestamp();
+
         if (input.inputProcess(player, &camera) == true) break :main_loop;
 
         render.renderSetCamera(camera);
@@ -227,6 +231,11 @@ pub fn main() !void {
             try render.renderDrawGameObjectWireframe(objects[i], objects[i].color);
         
         renderer.present();
+
+        // timestamp_1 = std.time.microTimestamp();
+
+        // const fps = 1e6 / (@as(f32, @floatFromInt(timestamp_1 - timestamp_0 + 1)));
+        // std.debug.print("FPS = {d}\n", .{fps});
 
         std.time.sleep(@round((1.0 / target_fps * 1000.0) * 1e6));
     }
