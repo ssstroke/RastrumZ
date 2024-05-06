@@ -48,7 +48,7 @@ pub fn vec2Length(v: Vec2) f32 {
 }
 
 pub fn vec2Normalize(v: Vec2) Vec2 {
-    const len_inverse: Vec2 = @splat(@as(f32, 1 / vec2Length(v)));
+    const len_inverse: Vec2 = @splat(@as(f32, 1.0 / vec2Length(v)));
     return v * len_inverse;
 }
 
@@ -89,7 +89,7 @@ pub fn vec3Length(v: Vec3) f32 {
 }
 
 pub fn vec3Normalize(v: Vec3) Vec3 {
-    const len_inverse: Vec3 = @splat(@as(f32, 1 / vec3Length(v)));
+    const len_inverse: Vec3 = @splat(@as(f32, 1.0 / vec3Length(v)));
     return v * len_inverse;
 }
 
@@ -100,7 +100,7 @@ pub fn vec3MulByMat4x4(v: Vec3, m: Mat4x4) Vec3 {
         v[2] * m[0][2] + v[1] * m[1][2] + v[2] * m[2][2] + m[3][2],
     };
 
-    const w_inverse: Vec3 = @splat(1 / ( v[0] * m[0][3] + v[1] * m[1][3] + v[2] * m[2][3] + m[3][3] ));
+    const w_inverse: Vec3 = @splat(1.0 / ( v[0] * m[0][3] + v[1] * m[1][3] + v[2] * m[2][3] + m[3][3] ));
     if (w_inverse[0] != 1 and w_inverse[0] != 0) {
         result *= w_inverse;
     }

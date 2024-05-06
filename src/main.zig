@@ -14,6 +14,8 @@ const colors = game.Color;
 pub const window_width = 640;
 pub const window_height = 640;
 
+const target_fps: f32 = 144;
+
 pub fn main() !void {
     std.debug.print("\nHello, face in a crowd!\n", .{});
 
@@ -31,7 +33,7 @@ pub fn main() !void {
         sdl.Window.pos_undefined,
         @as(i32, window_width),
         @as(i32, window_height),
-        .{},
+        .{.mouse_grabbed = true},
     );
     defer window.destroy();
 
@@ -119,7 +121,7 @@ pub fn main() !void {
         objects[4].transform[3][0] = 0;
         objects[4].transform[3][1] = 0;
         objects[4].transform[3][2] = -1;
-        objects[4].color = game.RGBA_COLOR_MAGENTA;
+        objects[4].color = game.RGBA_COLOR_GRUVBOX_BLUE;
 
         // Entities.
         //
@@ -193,7 +195,7 @@ pub fn main() !void {
     //
 
     const camera_angle_x = algebra.degreesToRadians(-45);
-    const camera = algebra.Mat4x4{
+    var camera = algebra.Mat4x4{
         algebra.Vec4{1, 0, 0, 0},
         algebra.Vec4{0, @cos(camera_angle_x), @sin(camera_angle_x), 0},
         algebra.Vec4{0, -@sin(camera_angle_x), @cos(camera_angle_x), 0},
@@ -205,15 +207,19 @@ pub fn main() !void {
     // Some objects that we will need direct access to.
     //
 
-    // const ball = &objects[3];
-    // const player = &objects[4];
-    // var ball_direction = algebra.Vec2{
-    //     @as(f32, @sin(algebra.degreesToRadians(45))),
-    //     -@as(f32, @sin(algebra.degreesToRadians(45))),
-    // };
+    const ball = &objects[3];
+    const player = &objects[4];
+    var ball_direction = algebra.Vec2{
+         @as(f32, @sin(algebra.degreesToRadians(45))),
+        -@as(f32, @sin(algebra.degreesToRadians(45))),
+    };
 
     main_loop: while (true) {
-        if (input.inputProcess() == true) break :main_loop;
+        if (input.inputProcess(player, &camera) == true) break :main_loop;
+
+        render.renderSetCamera(camera);
+
+        game.gameUpdate(&objects, ball, &ball_direction);
 
         try render.renderDrawBackground(game.RGBA_COLOR_GRUVBOX_BLACK);
 
@@ -222,6 +228,6 @@ pub fn main() !void {
         
         renderer.present();
 
-        // break :main_loop;
+        std.time.sleep(@round((1.0 / target_fps * 1000.0) * 1e6));
     }
 }
