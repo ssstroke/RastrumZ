@@ -4,7 +4,6 @@ const main = @import("main.zig");
 const mesh = @import("mesh.zig");
 
 const sdl = @import("zsdl2");
-const zmath = @import("zmath");
 
 const std = @import("std");
 

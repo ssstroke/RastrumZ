@@ -10,14 +10,12 @@ const std = @import("std");
 
 const colors = game.Color;
 
-pub const window_width = 640;
-pub const window_height = 640;
+pub const window_width = 800;
+pub const window_height = 800;
 
 const target_fps: f32 = 144;
 
 pub fn main() !void {
-    std.debug.print("\nHello, face in a crowd!\n", .{});
-
     // SDL init.
     //
 
