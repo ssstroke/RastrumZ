@@ -29,6 +29,7 @@ pub fn build(b: *std.Build) !void {
     try @import("zsdl").addLibraryPathsTo(exe, zsdl_path);
     @import("zsdl").link_SDL2(exe);
     try @import("zsdl").install_sdl2(&exe.step, target.result, .bin, zsdl_path);
+    exe.linkLibC();
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
