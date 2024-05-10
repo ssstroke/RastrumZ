@@ -19,7 +19,7 @@ pub fn inputProcess(player: *game.GameObject, camera: *algebra.Mat4x4) bool {
             const float_motion: f32 = @floatFromInt(event.motion.x);
             
             player.transform[3][0] = ((float_motion - width_half) / width_half) * 6;
-            camera[3][0] = ((float_motion - width_half) / width_half) * 6;
+            camera[3][0] = ((float_motion - width_half) / width_half) * 2;
         }
     }
 

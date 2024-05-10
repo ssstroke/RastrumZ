@@ -4,7 +4,6 @@
 
     .dependencies = .{
         .zsdl = .{ .path = "src/libs/zsdl" },
-        .zmath = .{ .path = "src/libs/zmath" },
     },
 
     .paths = .{
